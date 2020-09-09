@@ -1,6 +1,6 @@
 import { isTopOfSubtree, hasSameParent, getPathOnLevel, moveAfterPath, } from './path';
 import { between } from './handy';
-export const getFlatItemPath = (flattenedTree, sourceIndex) => flattenedTree[sourceIndex].path;
+export const getFlatItemPath = (flattenedTree, sourceIndex) => (flattenedTree[sourceIndex] && flattenedTree[sourceIndex].path);
 /*
   Calculates the source path after drag&drop ends
  */

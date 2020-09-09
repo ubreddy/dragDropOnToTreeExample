@@ -15,11 +15,14 @@ import Tree from './stdComponents/Tree'
 // import Drawer from './stdComponents/Drawer'
 import FoldList from './stdComponents/FoldList'
 // import TreeNode from './stdComponents/TreeNode'
-import { mutateTree, moveItemOnTree, flattenTree } from './utils/tree'
+import { copyTree, mutateTree, moveItemOnTree, addItemToTree, flattenTree } from './utils/tree'
 import { VelocityComponent } from 'velocity-react';
 import Toggle from './stdComponents/Decorators/Toggle'
 import { calculateFinalDropPositions } from './utils/Tree-utils'
 import DelayedFunction from './utils/delayed-function';
+
+import { v4 as uuidv4 } from 'uuid';
+
 // import App1 from './App'
 
 const ItemsContainer = styled.div`
@@ -233,7 +236,7 @@ export default class App extends React.Component {
   }
   onDragStart(result) {
 
-    console.log(`drag start ${JSON.stringify(result)}`)
+    // console.log(`drag start ${JSON.stringify(result)}`)
     const { tree } = this.state;
     const itemId = result.draggableId
     this.dragState = {
@@ -260,7 +263,7 @@ export default class App extends React.Component {
   onDragUpdate(update) {
 
     const { tree } = this.state;
-    console.log(`drag update${JSON.stringify(update)}`);
+    // console.log(`drag update${JSON.stringify(update)}`);
 
 
 
@@ -283,7 +286,7 @@ export default class App extends React.Component {
 
   }
   onDragEnd(result) {
-    const { tree } = this.state;
+    const { lists, tree } = this.state;
     console.log(`drag end${JSON.stringify(result)}`)
 
     this.expandTimer.stop();
@@ -294,15 +297,50 @@ export default class App extends React.Component {
       combine: result.combine,
     };
 
-    const flattenedTree = flattenTree(tree);
-    const { sourcePosition, destinationPosition } = calculateFinalDropPositions(tree, flattenedTree, finalDragState);
-
-
-    if (!destinationPosition) {
+    if(!result.destination) {
       return;
     }
 
-    const newTree = moveItemOnTree(tree, sourcePosition, destinationPosition);
+    const flattenedTree = flattenTree(tree);
+    const { sourcePosition, destinationPosition } = calculateFinalDropPositions(tree, flattenedTree, finalDragState);
+
+    let newTree = null;
+
+    // If the draggable didn't come from the tree, and draggableId exists
+    if(!result.source.droppableId.includes('tree') && result.draggableId) {
+
+      // Track down the source item
+      const [groupName, itemName] = result.draggableId.split("--")
+
+      // TODO: Do some error checking before attempting to pull data out of lists
+      const newItemSource = lists[groupName].items[itemName];
+
+      // Prefix random id with draggableId (because it already contains group + item name)
+      const newItemId = result.draggableId + "-" + uuidv4();
+      const newItem = {
+        "id": newItemId,
+        "children": [],
+        "hasChildren": false,
+        "isExpanded": false,
+        "isChildrenLoading": false,
+        "data": { "title": newItemSource.label }
+      };
+
+      // Copy the tree
+      newTree = copyTree(tree);
+
+      // Add new item in to the list of nodes
+      newTree.items[newItem.id] = newItem;
+
+      // Position the new node to the correct spot in the tree
+      newTree = addItemToTree(newTree, destinationPosition, newItem.id);
+
+    } else {
+
+      // Draggable is from the tree, so move it around the same tree
+      newTree = moveItemOnTree(tree, sourcePosition, destinationPosition);
+    }
+
     this.setState({
       ...this.state,
       tree: newTree,

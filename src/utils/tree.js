@@ -94,6 +94,15 @@ const flattenChildren = (tree, item, currentPath) => {
         : [];
 };
 /*
+  Return a shallow copy of the given tree
+ */
+export const copyTree = (tree) => {
+    return {
+        rootId: tree.rootId,
+        items: { ...tree.items }
+    };
+}
+/*
   Changes the tree data structure with minimal reference changes.
  */
 export const mutateTree = (tree, itemId, mutation) => {
@@ -103,19 +112,12 @@ export const mutateTree = (tree, itemId, mutation) => {
         return tree;
     }
     // Returning a clone of the tree structure and overwriting the field coming in mutation
-    return {
-        // rootId should not change
-        rootId: tree.rootId,
-        items: {
-            // copy all old items
-            ...tree.items,
-            // overwriting only the item being changed
-            [itemId]: {
-                ...itemToChange,
-                ...mutation,
-            },
-        },
+    let clonedTree = copyTree(tree);
+    clonedTree.items[itemId] = {
+        ...itemToChange,
+        ...mutation,
     };
+    return clonedTree;
 };
 export const getItem = (tree, path) => {
     let cursor = tree.items[tree.rootId];
@@ -129,6 +131,9 @@ export const getParent = (tree, path) => {
     return getItem(tree, parentPath);
 };
 export const getTreePosition = (tree, path) => {
+    if(!path) {
+        return null;
+    }
     const parent = getParent(tree, path);
     const index = getIndexAmongSiblings(path);
     return {
@@ -152,7 +157,7 @@ const removeItemFromTree = (tree, position) => {
         itemRemoved,
     };
 };
-const addItemToTree = (tree, position, item) => {
+export const addItemToTree = (tree, position, item) => {
     const destinationParent = tree.items[position.parentId];
     const newDestinationChildren = [...destinationParent.children];
     if (typeof position.index === 'undefined') {
