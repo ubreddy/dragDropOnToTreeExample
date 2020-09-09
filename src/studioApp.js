@@ -373,7 +373,6 @@ export default class App extends React.Component {
             onDragEnd={this.onDragEnd}
           >
             <ItemsContainer className="col-sm-2" >
-
               {
                 Object.keys(lists).map((g, j) => {
                   let list = lists[g]
@@ -388,15 +387,13 @@ export default class App extends React.Component {
                 })
               }
             </ItemsContainer>
+
             <div className="col-sm-10" >
-
-
-              <FlowContainer
-              >
-                <Title   >
+              <FlowContainer>
+                <Title>
                   {'Untitled flow'}
                 </Title>
-                <Steps  >
+                <Steps>
                   <Tree
                     tree={tree}
                     renderItem={this.renderItem}
@@ -406,13 +403,11 @@ export default class App extends React.Component {
                     isNestingEnabled
                   />
                 </Steps>
-
               </FlowContainer>
-
             </div>
+
           </DragDropContext>
         </ContentContainer>
-
       </div >
     );
   }
