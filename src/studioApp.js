@@ -1,18 +1,20 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+// import ReactDOM from 'react-dom';
 import '@atlaskit/css-reset';
 import styled from 'styled-components';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { lists, treeData } from './initialData';
+// import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { DragDropContext } from 'react-beautiful-dnd';
+// import { lists, treeData } from './initialData';
+import { lists } from './initialData';
 import { complexTree } from './data'
 import { Button } from 'reactstrap'
 
 import Tree from './stdComponents/Tree'
-import { genName } from './util'
-import NodeHeader from './stdComponents/NodeHeader'
-import Drawer from './stdComponents/Drawer'
+// import { genName } from './util'
+// import NodeHeader from './stdComponents/NodeHeader'
+// import Drawer from './stdComponents/Drawer'
 import FoldList from './stdComponents/FoldList'
-import TreeNode from './stdComponents/TreeNode'
+// import TreeNode from './stdComponents/TreeNode'
 import { mutateTree, moveItemOnTree, flattenTree } from './utils/tree'
 import { VelocityComponent } from 'velocity-react';
 import Toggle from './stdComponents/Decorators/Toggle'
@@ -69,10 +71,10 @@ const FlowContainer = styled.div`
   
 `;
 
-const Container = styled.div`  
-  background-color: ${props =>
-    props.isDraggingOver ? 'lightgrey' : 'inherit'};
-`;
+// const Container = styled.div`  
+//   background-color: ${props =>
+//     props.isDraggingOver ? 'lightgrey' : 'inherit'};
+// `;
 
 const Heading = styled.div`
 display: flex;
@@ -91,9 +93,9 @@ width: 100%;
 
 padding: 10px;
 `
-const ContentHeading = styled.h3`
-border-bottom: 1px lightgrey dotted;
-`
+// const ContentHeading = styled.h3`
+// border-bottom: 1px lightgrey dotted;
+// `
 
 const MenuButton = styled(Button)`
   
@@ -105,14 +107,14 @@ const MenuButton = styled(Button)`
   font-size: 0.75rem;
   padding: 5px 10px;  
 `
-const Item = styled.div`
-  border: none;
-  padding: 4px;
+// const Item = styled.div`
+//   border: none;
+//   padding: 4px;
   
-  margin:  2px 2px 2px 10px;
-  background-color: ${props => (props.isDragging ? 'lightgreen' : 'inherit')};
-  font-size: 0.75rem;
-`
+//   margin:  2px 2px 2px 10px;
+//   background-color: ${props => (props.isDragging ? 'lightgreen' : 'inherit')};
+//   font-size: 0.75rem;
+// `
 
 export default class App extends React.Component {
   constructor(props) {
@@ -337,16 +339,16 @@ export default class App extends React.Component {
     );
   }
   render() {
-    let fieldsMeta = this.fieldsMeta
+    // let fieldsMeta = this.fieldsMeta
     let optionsMenu = this.optionsMenu
-    let { quizzes, topics, surveys, topicQuizOrder, survey, modalEdit, modalView, isDirty, ...learning } = this.state
+    // let { quizzes, topics, surveys, topicQuizOrder, survey, modalEdit, modalView, isDirty, ...learning } = this.state
     // if (!surveys || !Object.keys(surveys).length) {
     //   optionsMenu = Array.from(this.optionsMenu)
     //   optionsMenu.splice(3, 0, { label: 'Add Survey', class: 'fa fa-plus-circle' })
     // }
     // else optionsMenu = this.optionsMenu
     const lists = this.state.lists
-    let { slots, apis, actions, cards } = this.state.lists
+    // let { slots, apis, actions, cards } = this.state.lists
     // const flow = { items: [{ name: 'Step ', }] }
     let tree = this.state.tree
     return (

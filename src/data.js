@@ -1,5 +1,5 @@
-import { getIndexAmongSiblings } from './utils/path'
-import { flattenTree, } from './utils/tree'
+// import { getIndexAmongSiblings } from './utils/path'
+// import { flattenTree, } from './utils/tree'
 import { getDestinationPath } from './utils/flat-tree'
 export const complexTree = {
     "rootId": "1",
@@ -206,5 +206,4 @@ const flattenedTree = [
     { "item": { "id": "1-7", "children": [], "hasChildren": false, "isExpanded": false, "isChildrenLoading": false, "data": { "title": "Title 1-7" } }, "path": [7] },
     { "item": { "id": "1-8", "children": [], "hasChildren": false, "isExpanded": false, "isChildrenLoading": false, "data": { "title": "Title 1-8" } }, "path": [8] }]
 
-debugger;
 console.log(JSON.stringify(getDestinationPath(flattenedTree, 8, 7)))

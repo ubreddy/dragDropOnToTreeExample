@@ -24,12 +24,13 @@ const Item = styled.div`
 class LeafItem extends React.Component {
     constructor(props) {
         super(props)
-        this.id = props.item && props.item.name || props.item.id
+        this.id = (props.item && props.item.name) || props.item.id
     }
 
     render() {
-        const { item, index, parentId } = this.props;
-        const name = item.name || item.id
+        // const { item, index, parentId } = this.props;
+        const { item, parentId } = this.props;
+        // const name = item.name || item.id
         const id = parentId ? `${parentId}--${item.name}` : item.name
         return (
             <Draggable draggableId={id} index={this.props.index}>
@@ -71,7 +72,7 @@ export default class TreeNode extends Component {
             <div>
                 {
                     childArray && childArray.map((i, k) => {
-                        let item = getItem && getItem(i) || children[i] || i
+                        let item = (getItem && getItem(i)) || children[i] || i
                         if (item && !item.children) {
                             // console.log(`index = ${parentIndex * 100 + k}`)
                             return (
