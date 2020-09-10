@@ -26,7 +26,8 @@ class Container extends PureComponent {
 
     render() {
         const {
-            decorators, terminal, node, onSelect, customStyles, provided
+            // decorators, terminal, node, onSelect, customStyles, provided
+            terminal, node, onSelect, customStyles
         } = this.props;
         return (
             <div >

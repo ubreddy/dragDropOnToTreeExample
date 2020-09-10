@@ -1,23 +1,28 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+// import ReactDOM from 'react-dom';
 import '@atlaskit/css-reset';
 import styled from 'styled-components';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { lists, treeData } from './initialData';
+// import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { DragDropContext } from 'react-beautiful-dnd';
+// import { lists, treeData } from './initialData';
+import { lists } from './initialData';
 import { complexTree } from './data'
 import { Button } from 'reactstrap'
 
 import Tree from './stdComponents/Tree'
-import { genName } from './util'
-import NodeHeader from './stdComponents/NodeHeader'
-import Drawer from './stdComponents/Drawer'
+// import { genName } from './util'
+// import NodeHeader from './stdComponents/NodeHeader'
+// import Drawer from './stdComponents/Drawer'
 import FoldList from './stdComponents/FoldList'
-import TreeNode from './stdComponents/TreeNode'
-import { mutateTree, moveItemOnTree, flattenTree } from './utils/tree'
+// import TreeNode from './stdComponents/TreeNode'
+import { copyTree, mutateTree, moveItemOnTree, addItemToTree, flattenTree } from './utils/tree'
 import { VelocityComponent } from 'velocity-react';
 import Toggle from './stdComponents/Decorators/Toggle'
 import { calculateFinalDropPositions } from './utils/Tree-utils'
 import DelayedFunction from './utils/delayed-function';
+
+import { v4 as uuidv4 } from 'uuid';
+
 // import App1 from './App'
 
 const ItemsContainer = styled.div`
@@ -69,10 +74,10 @@ const FlowContainer = styled.div`
   
 `;
 
-const Container = styled.div`  
-  background-color: ${props =>
-    props.isDraggingOver ? 'lightgrey' : 'inherit'};
-`;
+// const Container = styled.div`  
+//   background-color: ${props =>
+//     props.isDraggingOver ? 'lightgrey' : 'inherit'};
+// `;
 
 const Heading = styled.div`
 display: flex;
@@ -91,9 +96,9 @@ width: 100%;
 
 padding: 10px;
 `
-const ContentHeading = styled.h3`
-border-bottom: 1px lightgrey dotted;
-`
+// const ContentHeading = styled.h3`
+// border-bottom: 1px lightgrey dotted;
+// `
 
 const MenuButton = styled(Button)`
   
@@ -105,14 +110,14 @@ const MenuButton = styled(Button)`
   font-size: 0.75rem;
   padding: 5px 10px;  
 `
-const Item = styled.div`
-  border: none;
-  padding: 4px;
+// const Item = styled.div`
+//   border: none;
+//   padding: 4px;
   
-  margin:  2px 2px 2px 10px;
-  background-color: ${props => (props.isDragging ? 'lightgreen' : 'inherit')};
-  font-size: 0.75rem;
-`
+//   margin:  2px 2px 2px 10px;
+//   background-color: ${props => (props.isDragging ? 'lightgreen' : 'inherit')};
+//   font-size: 0.75rem;
+// `
 
 export default class App extends React.Component {
   constructor(props) {
@@ -231,7 +236,7 @@ export default class App extends React.Component {
   }
   onDragStart(result) {
 
-    console.log(`drag start ${JSON.stringify(result)}`)
+    // console.log(`drag start ${JSON.stringify(result)}`)
     const { tree } = this.state;
     const itemId = result.draggableId
     this.dragState = {
@@ -258,7 +263,7 @@ export default class App extends React.Component {
   onDragUpdate(update) {
 
     const { tree } = this.state;
-    console.log(`drag update${JSON.stringify(update)}`);
+    // console.log(`drag update${JSON.stringify(update)}`);
 
 
 
@@ -281,7 +286,7 @@ export default class App extends React.Component {
 
   }
   onDragEnd(result) {
-    const { tree } = this.state;
+    const { lists, tree } = this.state;
     console.log(`drag end${JSON.stringify(result)}`)
 
     this.expandTimer.stop();
@@ -292,15 +297,50 @@ export default class App extends React.Component {
       combine: result.combine,
     };
 
-    const flattenedTree = flattenTree(tree);
-    const { sourcePosition, destinationPosition } = calculateFinalDropPositions(tree, flattenedTree, finalDragState);
-
-
-    if (!destinationPosition) {
+    if(!result.destination) {
       return;
     }
 
-    const newTree = moveItemOnTree(tree, sourcePosition, destinationPosition);
+    const flattenedTree = flattenTree(tree);
+    const { sourcePosition, destinationPosition } = calculateFinalDropPositions(tree, flattenedTree, finalDragState);
+
+    let newTree = null;
+
+    // If the draggable didn't come from the tree, and draggableId exists
+    if(!result.source.droppableId.includes('tree') && result.draggableId) {
+
+      // Track down the source item
+      const [groupName, itemName] = result.draggableId.split("--")
+
+      // TODO: Do some error checking before attempting to pull data out of lists
+      const newItemSource = lists[groupName].items[itemName];
+
+      // Prefix random id with draggableId (because it already contains group + item name)
+      const newItemId = result.draggableId + "-" + uuidv4();
+      const newItem = {
+        "id": newItemId,
+        "children": [],
+        "hasChildren": false,
+        "isExpanded": false,
+        "isChildrenLoading": false,
+        "data": { "title": newItemSource.label }
+      };
+
+      // Copy the tree
+      newTree = copyTree(tree);
+
+      // Add new item in to the list of nodes
+      newTree.items[newItem.id] = newItem;
+
+      // Position the new node to the correct spot in the tree
+      newTree = addItemToTree(newTree, destinationPosition, newItem.id);
+
+    } else {
+
+      // Draggable is from the tree, so move it around the same tree
+      newTree = moveItemOnTree(tree, sourcePosition, destinationPosition);
+    }
+
     this.setState({
       ...this.state,
       tree: newTree,
@@ -337,16 +377,16 @@ export default class App extends React.Component {
     );
   }
   render() {
-    let fieldsMeta = this.fieldsMeta
+    // let fieldsMeta = this.fieldsMeta
     let optionsMenu = this.optionsMenu
-    let { quizzes, topics, surveys, topicQuizOrder, survey, modalEdit, modalView, isDirty, ...learning } = this.state
+    // let { quizzes, topics, surveys, topicQuizOrder, survey, modalEdit, modalView, isDirty, ...learning } = this.state
     // if (!surveys || !Object.keys(surveys).length) {
     //   optionsMenu = Array.from(this.optionsMenu)
     //   optionsMenu.splice(3, 0, { label: 'Add Survey', class: 'fa fa-plus-circle' })
     // }
     // else optionsMenu = this.optionsMenu
     const lists = this.state.lists
-    let { slots, apis, actions, cards } = this.state.lists
+    // let { slots, apis, actions, cards } = this.state.lists
     // const flow = { items: [{ name: 'Step ', }] }
     let tree = this.state.tree
     return (
@@ -371,7 +411,6 @@ export default class App extends React.Component {
             onDragEnd={this.onDragEnd}
           >
             <ItemsContainer className="col-sm-2" >
-
               {
                 Object.keys(lists).map((g, j) => {
                   let list = lists[g]
@@ -386,15 +425,13 @@ export default class App extends React.Component {
                 })
               }
             </ItemsContainer>
+
             <div className="col-sm-10" >
-
-
-              <FlowContainer
-              >
-                <Title   >
+              <FlowContainer>
+                <Title>
                   {'Untitled flow'}
                 </Title>
-                <Steps  >
+                <Steps>
                   <Tree
                     tree={tree}
                     renderItem={this.renderItem}
@@ -404,13 +441,11 @@ export default class App extends React.Component {
                     isNestingEnabled
                   />
                 </Steps>
-
               </FlowContainer>
-
             </div>
+
           </DragDropContext>
         </ContentContainer>
-
       </div >
     );
   }

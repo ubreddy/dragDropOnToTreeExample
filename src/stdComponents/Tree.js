@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { getBox } from 'css-box-model';
-import { calculateFinalDropPositions } from '../utils/Tree-utils';
+// import { calculateFinalDropPositions } from '../utils/Tree-utils';
 import { noop } from '../utils/handy';
 import { flattenTree, mutateTree } from '../utils/tree';
 import TreeItem from './TreeItem';
-import { getDestinationPath, getItemById, getIndexById, } from '../utils/flat-tree';
+// import { getDestinationPath, getItemById, getIndexById, } from '../utils/flat-tree';
+import { getDestinationPath, getIndexById, } from '../utils/flat-tree';
 import DelayedFunction from '../utils/delayed-function';
 export default class Tree extends Component {
     constructor() {

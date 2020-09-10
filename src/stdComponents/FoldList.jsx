@@ -40,6 +40,7 @@ const Item = styled.div`
   background-color: ${props => (props.isDragging ? 'lightgreen' : 'white')};
   font-size: 0.75rem;
 `
+
 class ListItem extends React.Component {
 
     render() {
@@ -48,14 +49,20 @@ class ListItem extends React.Component {
         return (
             <Draggable draggableId={id} index={this.props.index}>
                 {(provided, snapshot) => (
-
-                    <Item  {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        ref={provided.innerRef}
-                        isDragging={snapshot.isDragging}
-                        index={index}  ><p>{item && item.text}</p></Item>
-                )
-                }
+                    <React.Fragment>
+                        <Item
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            ref={provided.innerRef}
+                            isDragging={snapshot.isDragging}
+                            index={index}>
+                                <p>{item && item.text}</p>
+                        </Item>
+                        {snapshot.isDragging && (
+                            <Item>{item && item.text}</Item>
+                        )}
+                    </React.Fragment>
+                )}
             </Draggable>
 
         )
@@ -108,13 +115,9 @@ export default class FoldList extends Component {
 
 
                         <NodeHeader
-
                             node={{ name: list.name, children: list.items, toggled: list.toggled }}
-
                             onClick={() => this.onClick()}
-                        // onSelect={isFunction(onSelect) ? (() => onSelect(node)) : undefined}
-
-
+                            // onSelect={isFunction(onSelect) ? (() => onSelect(node)) : undefined}
                         />
                         <div className="ml-2">
                             <Drawer restAnimationInfo={{
@@ -126,12 +129,12 @@ export default class FoldList extends Component {
                                     animation: 'slideUp',
                                     duration: 300
                                 }
-                            }}  >
+                            }}>
                                 {list.toggled ? this.renderItems() : null}
                             </Drawer>
                         </div>
 
-                        {provided.placeholder}
+                        {/*provided.placeholder*/}
                     </Container>
                 )}
             </Droppable>
